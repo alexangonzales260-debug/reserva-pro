@@ -3,13 +3,15 @@
 Reglas duras del proyecto. Toda decisión técnica debe caber dentro de estos límites.
 Son obligatorias, no sugerencias.
 
-## Entorno
+## Entorno y Setup
 
 - SO: Linux Mint XFCE (base Ubuntu 24.04).
 - PHP 8.3.6 (CLI), Composer 2.7.1.
 - Ejecutor sin display gráfico: verificar SIEMPRE con `curl`, `pest`, `artisan test`,
   HTTP o CLI. Prohibido abrir navegador.
 - Directorio de trabajo: `reservapro/`.
+- **Regla de Scaffold**: Al crear proyectos con Composer/NPM, los archivos deben vivir en la
+  raíz del repositorio Git. Nunca permitir repositorios Git anidados (submodules accidentales).
 
 ## Stack exacto
 

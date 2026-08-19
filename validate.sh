@@ -49,14 +49,22 @@ else
     fail "Pint: hay archivos fuera de estilo"
 fi
 
-step "4. php artisan test"
+step "4. Migraciones limpias en memoria (gate pre-test)"
+if php artisan migrate:fresh --seed --force --env=testing; then
+    ok "Migraciones + seeders OK en sqlite :memory:"
+else
+    fail "Migraciones + seeders fallaron"
+    exit 1
+fi
+
+step "5. php artisan test"
 if php artisan test; then
     ok "Tests verdes"
 else
     fail "Tests en rojo"
 fi
 
-step "5. APIs prohibidas en app/ (debe devolver NADA)"
+step "6. APIs prohibidas en app/ (debe devolver NADA)"
 OUT=$(grep -rnE '\b(eval|exec|shell_exec|system|passthru|proc_open)[[:space:]]*\(' app/ 2>/dev/null)
 if [ -z "$OUT" ]; then
     ok "Sin APIs prohibidas"
@@ -65,7 +73,7 @@ else
     echo "$OUT"
 fi
 
-step "6. dd()/dump() en app/ (debe devolver NADA)"
+step "7. dd()/dump() en app/ (debe devolver NADA)"
 OUT=$(grep -rnE '\b(dd|dump)[[:space:]]*\(' app/ 2>/dev/null)
 if [ -z "$OUT" ]; then
     ok "Sin dd()/dump() en app/"

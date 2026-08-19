@@ -5,3 +5,4 @@ Tabla: `fase | tests | warnings | incidentes | validate | hash commit`
 | Fase | Tests | Warnings | Incidentes | validate | Hash commit |
 |------|-------|----------|------------|----------|-------------|
 | F0 Bootstrap | 2 (Pest) | 0 | 0 | OK (código 0) | `f8fcfde` |
+| F1 Modelos/Migraciones/Seeders | 7 (Pest) | 0 | 0 (APP_KEY testing resuelto) | OK (código 0) | `pendiente` |
