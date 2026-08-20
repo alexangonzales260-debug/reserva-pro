@@ -13,7 +13,7 @@ class AdminUserSeeder extends Seeder
     public function run(): void
     {
         User::query()->updateOrCreate(
-            ['email' => 'admin@reservapro.pe'],
+            ['email' => 'admin@reservafacil.test'],
             [
                 'name' => 'Admin ReservaPro',
                 'password' => 'password',

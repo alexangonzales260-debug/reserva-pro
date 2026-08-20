@@ -37,3 +37,15 @@ Formato: **Contexto / Decisión / Consecuencia** (3 líneas por ADR).
 **Contexto**: Sin estructura, los controllers se convierten en "gordos" e inmantenibles.
 **Decisión**: Controller delgado → FormRequest (validación) → Action/Service (lógica) → Model; salida JSON vía Resource; autorización vía Policy; estados vía Enums.
 **Consecuencia**: Responsabilidades únicas, código testeable y consistente entre features.
+
+## D7 — Contrato API `work_start`/`work_end` vs. columnas `start_time`/`end_time`
+
+**Contexto**: La API (Fase 2) expone horario de empleado como `work_start`/`work_end`, pero las columnas de BD se crearon en F1 como `start_time`/`end_time`.
+**Decisión**: No renombrar columnas; alias virtuales con accessor+mutator en `Employee` que mapean `work_start`→`start_time` y `work_end`→`end_time`. El contrato REST queda estable y la BD intacta.
+**Consecuencia**: `$fillable` incluye ambos nombres; el API y la UI hablan el mismo idioma mientras la persistencia no cambia.
+
+## D8 — `reservations.user_id` nullable para reservas de invitados
+
+**Contexto**: La Fase 2 expone la API sin autenticación y el SPEC permite clientes invitados que reservan solo con código; la columna `user_id` era NOT NULL.
+**Decisión**: Migración que hace `user_id` nullable; `ReservationResource` devuelve `user: null` cuando no hay usuario vinculado.
+**Consecuencia**: Reservas de invitados posibles desde la API pública; la relación queda disponible cuando el cliente se registre o inicie sesión.

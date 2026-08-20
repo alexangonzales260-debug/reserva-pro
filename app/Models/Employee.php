@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'email', 'phone', 'is_active', 'start_time', 'end_time'])]
+#[Fillable(['name', 'email', 'phone', 'is_active', 'start_time', 'end_time', 'work_start', 'work_end'])]
 class Employee extends Model
 {
     use HasFactory;
@@ -23,6 +23,38 @@ class Employee extends Model
         return [
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * Alias virtual "work_start" sobre la columna "start_time".
+     */
+    protected function getWorkStartAttribute(): ?string
+    {
+        return $this->attributes['start_time'] ?? null;
+    }
+
+    /**
+     * Alias virtual "work_start" sobre la columna "start_time".
+     */
+    protected function setWorkStartAttribute(string $value): void
+    {
+        $this->attributes['start_time'] = $value;
+    }
+
+    /**
+     * Alias virtual "work_end" sobre la columna "end_time".
+     */
+    protected function getWorkEndAttribute(): ?string
+    {
+        return $this->attributes['end_time'] ?? null;
+    }
+
+    /**
+     * Alias virtual "work_end" sobre la columna "end_time".
+     */
+    protected function setWorkEndAttribute(string $value): void
+    {
+        $this->attributes['end_time'] = $value;
     }
 
     /**

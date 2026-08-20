@@ -82,6 +82,15 @@ else
     echo "$OUT"
 fi
 
+step "8. Rutas API v1 (debe detectar al menos 10)"
+API_ROUTES=$(php artisan route:list --path=api/v1 2>/dev/null | grep -c "api/v1" || true)
+if [ "$API_ROUTES" -ge 10 ]; then
+    ok "Rutas API detectadas: $API_ROUTES (mínimo 10)"
+else
+    fail "Solo $API_ROUTES rutas API (se requieren al menos 10)"
+    exit 1
+fi
+
 echo ""
 echo "=========================================="
 if [ "$FAIL" -eq 0 ]; then

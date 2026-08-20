@@ -111,7 +111,7 @@ it('enforces a unique reservation code', function () {
 it('seeds an admin user with the admin role', function () {
     $this->seed(AdminUserSeeder::class);
 
-    $admin = User::query()->where('email', 'admin@reservapro.pe')->first();
+    $admin = User::query()->where('email', 'admin@reservafacil.test')->first();
 
     expect($admin)->not->toBeNull();
     expect($admin->role)->toBe(User::ROLE_ADMIN);
