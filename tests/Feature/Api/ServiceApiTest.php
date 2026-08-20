@@ -1,9 +1,16 @@
 <?php
 
 use App\Models\Service;
+use App\Models\User;
+use Database\Seeders\AdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
+
+beforeEach(function (): void {
+    $this->seed(AdminUserSeeder::class);
+    $this->actingAs(User::query()->where('email', 'admin@reservapro.pe')->first());
+});
 
 it('lists only active services', function () {
     Service::create(['name' => 'Corte', 'duration_minutes' => 30, 'price' => 25.00]);

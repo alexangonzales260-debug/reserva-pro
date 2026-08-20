@@ -1,5 +1,7 @@
 # PLAN.md — ReservaPro
 
+> **Avance:** F0 ✅ · F1 ✅ · F2 ✅ · F3 ✅ · **Fase 4 (autenticación del dueño) ✅** · pendientes: multi-tenancy, lógica de reservas del cliente, panel dueño, flujo público, notificaciones, reportes, hardening.
+
 Fases atómicas. Cada fase termina con: archivos creados/modificados, criterio de cierre
 y comandos de verificación. Nunca se salta una fase sin aprobación del Arquitecto.
 

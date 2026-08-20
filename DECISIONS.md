@@ -49,3 +49,9 @@ Formato: **Contexto / Decisión / Consecuencia** (3 líneas por ADR).
 **Contexto**: La Fase 2 expone la API sin autenticación y el SPEC permite clientes invitados que reservan solo con código; la columna `user_id` era NOT NULL.
 **Decisión**: Migración que hace `user_id` nullable; `ReservationResource` devuelve `user: null` cuando no hay usuario vinculado.
 **Consecuencia**: Reservas de invitados posibles desde la API pública; la relación queda disponible cuando el cliente se registre o inicie sesión.
+
+## D9 — Autenticación del dueño con sesión nativa; multi-tenancy postergado
+
+**Contexto**: En Fase 2 toda la API era pública; había que proteger la escritura administrativa (servicios/empleados) sin Breeze/Sanctum/Fortify y el multi-tenancy no existe aún.
+**Decisión**: Sesión nativa de Laravel sobre el grupo `api` (EncryptCookies + AddQueuedCookiesToResponse + StartSession añadidos vía `Middleware::api(prepend:)`), `Auth::attempt` contra usuarios con `role=admin` (el campo `role` de F1 ya distinguía al dueño vía `isAdmin()`, no se añadió `is_admin` redundante), rutas de escritura protegidas con `middleware('auth')` y 401 JSON en español vía render de `AuthenticationException`. CSRF no se aplica a `api/*` (patrón JSON API con cookie SameSite=Lax, coherente con el flujo de tests/curl).
+**Consecuencia**: Solo el dueño autenticado crea/edita/elimina servicios y empleados; lecturas y flujo de reservas del cliente siguen anónimos; el multi-tenancy se posterga hasta tener el dueño autenticado como base para el `NegocioScope`.
