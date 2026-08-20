@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'email', 'phone', 'is_active', 'start_time', 'end_time', 'work_start', 'work_end'])]
+#[Fillable(['name', 'email', 'phone', 'is_active', 'start_time', 'end_time', 'work_start', 'work_end', 'negocio_id'])]
 class Employee extends Model
 {
     use HasFactory;
@@ -23,6 +24,14 @@ class Employee extends Model
         return [
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * @return BelongsTo<Negocio, $this>
+     */
+    public function negocio(): BelongsTo
+    {
+        return $this->belongsTo(Negocio::class);
     }
 
     /**

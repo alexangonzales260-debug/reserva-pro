@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['code', 'user_id', 'service_id', 'employee_id', 'start_at', 'end_at', 'status', 'notes'])]
+#[Fillable(['code', 'user_id', 'service_id', 'employee_id', 'start_at', 'end_at', 'status', 'notes', 'negocio_id'])]
 class Reservation extends Model
 {
     use HasFactory;
@@ -31,6 +31,14 @@ class Reservation extends Model
             'start_at' => 'datetime',
             'end_at' => 'datetime',
         ];
+    }
+
+    /**
+     * @return BelongsTo<Negocio, $this>
+     */
+    public function negocio(): BelongsTo
+    {
+        return $this->belongsTo(Negocio::class);
     }
 
     /**

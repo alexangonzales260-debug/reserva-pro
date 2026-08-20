@@ -55,3 +55,9 @@ Formato: **Contexto / Decisión / Consecuencia** (3 líneas por ADR).
 **Contexto**: En Fase 2 toda la API era pública; había que proteger la escritura administrativa (servicios/empleados) sin Breeze/Sanctum/Fortify y el multi-tenancy no existe aún.
 **Decisión**: Sesión nativa de Laravel sobre el grupo `api` (EncryptCookies + AddQueuedCookiesToResponse + StartSession añadidos vía `Middleware::api(prepend:)`), `Auth::attempt` contra usuarios con `role=admin` (el campo `role` de F1 ya distinguía al dueño vía `isAdmin()`, no se añadió `is_admin` redundante), rutas de escritura protegidas con `middleware('auth')` y 401 JSON en español vía render de `AuthenticationException`. CSRF no se aplica a `api/*` (patrón JSON API con cookie SameSite=Lax, coherente con el flujo de tests/curl).
 **Consecuencia**: Solo el dueño autenticado crea/edita/elimina servicios y empleados; lecturas y flujo de reservas del cliente siguen anónimos; el multi-tenancy se posterga hasta tener el dueño autenticado como base para el `NegocioScope`.
+
+## D10 — `negocio_id` NULLABLE en BD; aislamiento a nivel de aplicación
+
+**Contexto**: El multi-tenancy (SIS-01) exige `negocio_id` en services/employees/reservations, pero SQLite maneja mal los ALTER a NOT NULL sobre columnas existentes.
+**Decisión**: `negocio_id` queda NULLABLE a nivel de BD (foreignId nullable constrained); el aislamiento real se hará con `NegocioScope` en la fase siguiente, nunca por constraint.
+**Consecuencia**: Migraciones limpias y seguras en SQLite; los datos sin negocio conviven mientras no haya scope; la garantía de aislamiento pasa a la capa de aplicación (scope + policies).
