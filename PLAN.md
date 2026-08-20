@@ -1,6 +1,6 @@
 # PLAN.md — ReservaPro
 
-> **Avance:** F0 ✅ · F1 ✅ · F2 ✅ · F3 ✅ · F4 ✅ · F5 ✅ · **F6 (NegocioScope + aislamiento real de tenants) ✅** · pendientes: panel dueño (multi-tenant end-to-end), flujo público de reserva, notificaciones, reportes, hardening.
+> **Avance:** F0 ✅ · F1 ✅ · F2 ✅ · F3 ✅ · F4 ✅ · F5 ✅ · F6 ✅ · **F7 (Autenticación del dueño: registro crea Negocio + login/logout + middleware) ✅** · pendientes: panel dueño (multi-tenant end-to-end), flujo público de reserva, notificaciones, reportes, hardening.
 
 Fases atómicas. Cada fase termina con: archivos creados/modificados, criterio de cierre
 y comandos de verificación. Nunca se salta una fase sin aprobación del Arquitecto.
@@ -34,6 +34,8 @@ y comandos de verificación. Nunca se salta una fase sin aprobación del Arquite
 - **Archivos**: Login/Register (Breeze o manual), middleware, roles, registro de tenant (Action `RegisterTenant`).
 - **Criterio de cierre**: dueño registra negocio; cliente registra cuenta; sesiones y rutas protegidas.
 - **Verificación**: Pest feature de auth + rutas protegidas redirigen.
+- **Nota**: autenticación del dueño implementada en **Fase 4** (sesión nativa sobre grupo api, D9) y
+  **Fase 7** (registro atómico User+Negocio, login/logout de owner, middleware `SetCurrentNegocio`, D12).
 
 ## F4 — Lógica de reservas (conflictos)
 

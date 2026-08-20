@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\SetCurrentNegocio;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -17,10 +18,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->web(append: [
+            SetCurrentNegocio::class,
+        ]);
+
         $middleware->api(prepend: [
             EncryptCookies::class,
             AddQueuedCookiesToResponse::class,
             StartSession::class,
+            SetCurrentNegocio::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

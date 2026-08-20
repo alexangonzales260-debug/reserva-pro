@@ -67,3 +67,9 @@ Formato: **Contexto / Decisión / Consecuencia** (3 líneas por ADR).
 **Contexto**: Fase 5 dejó `negocio_id` nullable sin aislamiento; ninguna query filtraba por tenant y los 34 tests existentes asumían ver todos los datos.
 **Decisión**: `CurrentNegocio` (clase con estado estático: `set/get/isSet/clear`) resuelve el negocio activo del proceso; `NegocioScope` (Global Scope registrado vía trait `BelongsToNegocio` en Service/Employee/Reservation) añade `where negocio_id = ?` solo cuando `CurrentNegocio::isSet()`. El modelo `Negocio` no lleva el scope (tenant raíz).
 **Consecuencia**: Sin contexto el scope es un no-op (compatibilidad total con tests y flujo anónimo); con contexto, todas las queries —incluidas relaciones— quedan aisladas por tenant; el estado es por proceso (estático), así que `clear()` debe ejecutarse al final de cada request/test.
+
+## D12 — Registro de dueño atómico + contexto de negocio vía sesión
+
+**Contexto**: F6 dejó el scope listo pero sin fuente de contexto: nadie llamaba `CurrentNegocio::set()` y no existía registro de dueños que creara su Negocio.
+**Decisión**: `POST /api/v1/auth/register` crea `User` (role=owner) + `Negocio` en una transacción DB y enlaza `user.negocio_id`; el middleware `SetCurrentNegocio` (grupos `web` y `api`, tras StartSession) setea `CurrentNegocio` desde `user.negocio_id` del autenticado; `POST /api/v1/auth/login` solo admite role=owner (403 para el resto); `logout` limpia sesión y `CurrentNegocio::clear()`. El login legacy `/api/v1/login` (admin de seed, F4) se conserva intacto y las contraseñas usan el cast `hashed` de Laravel (bcrypt vía Hash).
+**Consecuencia**: El dueño autenticado queda automáticamente aislado en su negocio (scope activo por sesión); el registro es atómico (user+negocio juntos o ninguno); el login de no-owner queda prohibido; los 47 tests (40 previos + 7 nuevos) siguen verdes.

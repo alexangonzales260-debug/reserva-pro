@@ -5,13 +5,17 @@ use App\Http\Controllers\Api\V1\AvailabilityController;
 use App\Http\Controllers\Api\V1\EmployeeController;
 use App\Http\Controllers\Api\V1\ReservationController;
 use App\Http\Controllers\Api\V1\ServiceController;
+use App\Http\Controllers\Owner\AuthController as OwnerAuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
     Route::post('login', [AuthController::class, 'login'])->name('login');
+    Route::post('auth/register', [OwnerAuthController::class, 'register'])->name('auth.register');
+    Route::post('auth/login', [OwnerAuthController::class, 'login'])->name('auth.login');
 
     Route::middleware('auth')->group(function (): void {
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+        Route::post('auth/logout', [OwnerAuthController::class, 'logout'])->name('auth.logout');
 
         Route::post('services', [ServiceController::class, 'store'])->name('services.store');
         Route::put('services/{service}', [ServiceController::class, 'update'])->name('services.update');
