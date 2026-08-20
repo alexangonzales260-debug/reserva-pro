@@ -1,6 +1,6 @@
 # PLAN.md — ReservaPro
 
-> **Avance:** F0 ✅ · F1 ✅ · F2 ✅ · F3 ✅ · F4 ✅ · **F5 (base multi-tenant: Negocio + negocio_id) ✅** · pendientes: NegocioScope/aislamiento, lógica de reservas del cliente, panel dueño, flujo público, notificaciones, reportes, hardening.
+> **Avance:** F0 ✅ · F1 ✅ · F2 ✅ · F3 ✅ · F4 ✅ · F5 ✅ · **F6 (NegocioScope + aislamiento real de tenants) ✅** · pendientes: panel dueño (multi-tenant end-to-end), flujo público de reserva, notificaciones, reportes, hardening.
 
 Fases atómicas. Cada fase termina con: archivos creados/modificados, criterio de cierre
 y comandos de verificación. Nunca se salta una fase sin aprobación del Arquitecto.
@@ -26,6 +26,8 @@ y comandos de verificación. Nunca se salta una fase sin aprobación del Arquite
   aplicado en cada modelo tenant-scoped.
 - **Criterio de cierre**: queries del tenant A no ven datos del tenant B (tests Pest).
 - **Verificación**: `php artisan test` con tests de aislamiento.
+- **Nota**: implementado como **Fase 6** (`CurrentNegocio`, `NegocioScope`, trait `BelongsToNegocio`,
+  `TenantIsolationTest` con 6 casos). La fase concreta queda registrada en DECISIONS.md (D11).
 
 ## F3 — Autenticación (dueño + cliente)
 
@@ -45,6 +47,8 @@ y comandos de verificación. Nunca se salta una fase sin aprobación del Arquite
 - **Archivos**: CRUD servicios/empleados/horarios, listado y gestión de reservas, dashboard con métricas.
 - **Criterio de cierre**: dueño gestiona TODO de su negocio; UI en español.
 - **Verificación**: Pest feature + `curl` de rutas (sin navegador).
+- **Nota**: esta será la siguiente fase concreta (F7): atar el negocio del dueño autenticado vía
+  `CurrentNegocio::set()` para que el panel opere aislado por tenant.
 
 ## F6 — Flujo público de reserva
 

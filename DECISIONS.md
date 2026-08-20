@@ -61,3 +61,9 @@ Formato: **Contexto / Decisión / Consecuencia** (3 líneas por ADR).
 **Contexto**: El multi-tenancy (SIS-01) exige `negocio_id` en services/employees/reservations, pero SQLite maneja mal los ALTER a NOT NULL sobre columnas existentes.
 **Decisión**: `negocio_id` queda NULLABLE a nivel de BD (foreignId nullable constrained); el aislamiento real se hará con `NegocioScope` en la fase siguiente, nunca por constraint.
 **Consecuencia**: Migraciones limpias y seguras en SQLite; los datos sin negocio conviven mientras no haya scope; la garantía de aislamiento pasa a la capa de aplicación (scope + policies).
+
+## D11 — NegocioScope: filtrado por negocio activo, no-op sin contexto
+
+**Contexto**: Fase 5 dejó `negocio_id` nullable sin aislamiento; ninguna query filtraba por tenant y los 34 tests existentes asumían ver todos los datos.
+**Decisión**: `CurrentNegocio` (clase con estado estático: `set/get/isSet/clear`) resuelve el negocio activo del proceso; `NegocioScope` (Global Scope registrado vía trait `BelongsToNegocio` en Service/Employee/Reservation) añade `where negocio_id = ?` solo cuando `CurrentNegocio::isSet()`. El modelo `Negocio` no lleva el scope (tenant raíz).
+**Consecuencia**: Sin contexto el scope es un no-op (compatibilidad total con tests y flujo anónimo); con contexto, todas las queries —incluidas relaciones— quedan aisladas por tenant; el estado es por proceso (estático), así que `clear()` debe ejecutarse al final de cada request/test.

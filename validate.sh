@@ -65,14 +65,30 @@ else
     exit 1
 fi
 
-step "6. php artisan test"
+step "6. Base multi-tenant: NegocioScope presente"
+if grep -rq "class NegocioScope" app/; then
+    ok "NegocioScope detectado"
+else
+    fail "Falta NegocioScope"
+    exit 1
+fi
+
+step "7. Scope aplicado en modelos tenant"
+if grep -rqE "BelongsToNegocio|NegocioScope" app/Models/Service.php app/Models/Employee.php app/Models/Reservation.php; then
+    ok "Service/Employee/Reservation usan BelongsToNegocio/NegocioScope"
+else
+    fail "Falta scope tenant en modelos"
+    exit 1
+fi
+
+step "8. php artisan test"
 if php artisan test; then
     ok "Tests verdes"
 else
     fail "Tests en rojo"
 fi
 
-step "7. APIs prohibidas en app/ (debe devolver NADA)"
+step "9. APIs prohibidas en app/ (debe devolver NADA)"
 OUT=$(grep -rnE '\b(eval|exec|shell_exec|system|passthru|proc_open)[[:space:]]*\(' app/ 2>/dev/null)
 if [ -z "$OUT" ]; then
     ok "Sin APIs prohibidas"
@@ -81,7 +97,7 @@ else
     echo "$OUT"
 fi
 
-step "8. dd()/dump() en app/ (debe devolver NADA)"
+step "10. dd()/dump() en app/ (debe devolver NADA)"
 OUT=$(grep -rnE '\b(dd|dump)[[:space:]]*\(' app/ 2>/dev/null)
 if [ -z "$OUT" ]; then
     ok "Sin dd()/dump() en app/"
@@ -90,7 +106,7 @@ else
     echo "$OUT"
 fi
 
-step "9. Rutas API v1 (debe detectar al menos 10)"
+step "11. Rutas API v1 (debe detectar al menos 10)"
 API_ROUTES=$(php artisan route:list --path=api/v1 2>/dev/null | grep -c "api/v1" || true)
 if [ "$API_ROUTES" -ge 10 ]; then
     ok "Rutas API detectadas: $API_ROUTES (mínimo 10)"

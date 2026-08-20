@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToNegocio;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable(['code', 'user_id', 'service_id', 'employee_id', 'start_at', 'end_at', 'status', 'notes', 'negocio_id'])]
 class Reservation extends Model
 {
+    use BelongsToNegocio;
     use HasFactory;
 
     public const STATUS_PENDING = 'pending';
@@ -31,14 +33,6 @@ class Reservation extends Model
             'start_at' => 'datetime',
             'end_at' => 'datetime',
         ];
-    }
-
-    /**
-     * @return BelongsTo<Negocio, $this>
-     */
-    public function negocio(): BelongsTo
-    {
-        return $this->belongsTo(Negocio::class);
     }
 
     /**
