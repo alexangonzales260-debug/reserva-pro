@@ -108,3 +108,57 @@ it('lists reservations with status, employee and date filters', function () {
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.code', 'RF-AAAAAA');
 });
+
+it('rejects a reservation that overlaps directly (10:00-10:30 vs 10:00-10:30)', function () {
+    $service = Service::create(['name' => 'Corte', 'duration_minutes' => 30, 'price' => 25.00]);
+    $employee = Employee::create(['name' => 'María', 'work_start' => '09:00', 'work_end' => '18:00']);
+
+    $this->postJson('/api/v1/reservations', [
+        'service_id' => $service->id,
+        'employee_id' => $employee->id,
+        'start_at' => '2026-08-22T10:00:00',
+    ])->assertCreated();
+
+    $this->postJson('/api/v1/reservations', [
+        'service_id' => $service->id,
+        'employee_id' => $employee->id,
+        'start_at' => '2026-08-22T10:00:00',
+    ])->assertStatus(409)
+        ->assertJsonPath('message', 'El empleado ya tiene una reserva en ese horario.');
+});
+
+it('rejects a reservation that partially overlaps (10:00-10:30 vs 10:15-10:45)', function () {
+    $service = Service::create(['name' => 'Corte', 'duration_minutes' => 30, 'price' => 25.00]);
+    $employee = Employee::create(['name' => 'María', 'work_start' => '09:00', 'work_end' => '18:00']);
+
+    $this->postJson('/api/v1/reservations', [
+        'service_id' => $service->id,
+        'employee_id' => $employee->id,
+        'start_at' => '2026-08-22T10:00:00',
+    ])->assertCreated();
+
+    $this->postJson('/api/v1/reservations', [
+        'service_id' => $service->id,
+        'employee_id' => $employee->id,
+        'start_at' => '2026-08-22T10:15:00',
+    ])->assertStatus(409);
+});
+
+it('allows an adjacent reservation (10:00-10:30 vs 10:30-11:00)', function () {
+    $service = Service::create(['name' => 'Corte', 'duration_minutes' => 30, 'price' => 25.00]);
+    $employee = Employee::create(['name' => 'María', 'work_start' => '09:00', 'work_end' => '18:00']);
+
+    $this->postJson('/api/v1/reservations', [
+        'service_id' => $service->id,
+        'employee_id' => $employee->id,
+        'start_at' => '2026-08-22T10:00:00',
+    ])->assertCreated();
+
+    $this->postJson('/api/v1/reservations', [
+        'service_id' => $service->id,
+        'employee_id' => $employee->id,
+        'start_at' => '2026-08-22T10:30:00',
+    ])->assertCreated();
+
+    $this->assertDatabaseCount('reservations', 2);
+});

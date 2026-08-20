@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Actions\CheckReservationConflict;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreReservationRequest;
 use App\Http\Resources\ReservationResource;
@@ -15,6 +16,13 @@ use Illuminate\Support\Str;
 
 class ReservationController extends Controller
 {
+    private CheckReservationConflict $conflictChecker;
+
+    public function __construct(CheckReservationConflict $conflictChecker)
+    {
+        $this->conflictChecker = $conflictChecker;
+    }
+
     /**
      * List reservations with optional filters (status, employee_id, date).
      */
@@ -48,13 +56,20 @@ class ReservationController extends Controller
 
         $service = Service::query()->findOrFail($data['service_id']);
         $startAt = Carbon::parse($data['start_at']);
+        $endAt = $startAt->copy()->addMinutes($service->duration_minutes);
+
+        if ($this->conflictChecker->handle($data['employee_id'], $startAt, $endAt)) {
+            return response()->json([
+                'message' => 'El empleado ya tiene una reserva en ese horario.',
+            ], 409);
+        }
 
         $reservation = Reservation::query()->create([
             'code' => $this->generateUniqueCode(),
             'service_id' => $service->id,
             'employee_id' => $data['employee_id'],
             'start_at' => $startAt,
-            'end_at' => $startAt->copy()->addMinutes($service->duration_minutes),
+            'end_at' => $endAt,
             'status' => Reservation::STATUS_PENDING,
             'notes' => $data['notes'] ?? null,
         ]);

@@ -57,14 +57,22 @@ else
     exit 1
 fi
 
-step "5. php artisan test"
+step "5. Lógica de conflictos implementada"
+if grep -rq "CheckReservationConflict" app/; then
+    ok "Action de conflictos detectado"
+else
+    fail "Falta Action de conflictos"
+    exit 1
+fi
+
+step "6. php artisan test"
 if php artisan test; then
     ok "Tests verdes"
 else
     fail "Tests en rojo"
 fi
 
-step "6. APIs prohibidas en app/ (debe devolver NADA)"
+step "7. APIs prohibidas en app/ (debe devolver NADA)"
 OUT=$(grep -rnE '\b(eval|exec|shell_exec|system|passthru|proc_open)[[:space:]]*\(' app/ 2>/dev/null)
 if [ -z "$OUT" ]; then
     ok "Sin APIs prohibidas"
@@ -73,7 +81,7 @@ else
     echo "$OUT"
 fi
 
-step "7. dd()/dump() en app/ (debe devolver NADA)"
+step "8. dd()/dump() en app/ (debe devolver NADA)"
 OUT=$(grep -rnE '\b(dd|dump)[[:space:]]*\(' app/ 2>/dev/null)
 if [ -z "$OUT" ]; then
     ok "Sin dd()/dump() en app/"
@@ -82,7 +90,7 @@ else
     echo "$OUT"
 fi
 
-step "8. Rutas API v1 (debe detectar al menos 10)"
+step "9. Rutas API v1 (debe detectar al menos 10)"
 API_ROUTES=$(php artisan route:list --path=api/v1 2>/dev/null | grep -c "api/v1" || true)
 if [ "$API_ROUTES" -ge 10 ]; then
     ok "Rutas API detectadas: $API_ROUTES (mínimo 10)"
