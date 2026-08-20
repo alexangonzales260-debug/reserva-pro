@@ -11,4 +11,4 @@ Tabla: `fase | tests | warnings | incidentes | validate | hash commit`
 | F4 Autenticación del dueño + protección de rutas | 34 (Pest, 129 assertions) | 0 | 0 (sesión nativa sobre grupo api; `role` de F1 usado para admin, sin `is_admin`) | OK (código 0) | `5fc141e` |
 | F5 Base multi-tenant: Negocio + negocio_id | 34 (Pest, 129 assertions) | 0 | 0 (`negocio_id` nullable en BD por SQLite, D10) | OK (código 0) | `480ecdb` |
 | F6 NegocioScope + aislamiento real de tenants | 40 (Pest, 141 assertions) | 0 | 0 (trait `BelongsToNegocio`; gate 7 adaptado: `BelongsToNegocio\|NegocioScope`, D11) | OK (código 0, 12 comprobaciones) | `b4b99ee` |
-| F7 Autenticación del dueño (registro+login/logout+middleware) | 47 (Pest, 169 assertions) | 0 | 0 (registro atómico User+Negocio; middleware `SetCurrentNegocio`; login legacy admin intacto, D12) | OK (código 0, 13 comprobaciones) | `PENDIENTE` |
+| F7 Autenticación del dueño (registro+login/logout+middleware) | 47 (Pest, 169 assertions) | 0 | 0 (registro atómico User+Negocio; middleware `SetCurrentNegocio`; login legacy admin intacto, D12) | OK (código 0, 13 comprobaciones) | `69e2ee0` |
